@@ -38,12 +38,12 @@ const props = defineProps<{
           <FieldLabel for="password">
             Password
           </FieldLabel>
-          <a
-            href="#"
-            class="ml-auto text-sm underline-offset-4 hover:underline"
+          <NuxtLink
+            to="/auth/forgot-password"
+            class="ml-auto text-sm underline-offset-4 hover:underline hover:text-primary"
           >
             Forgot your password?
-          </a>
+          </NuxtLink>
         </div>
         <Input id="password" type="password" required />
       </Field>
