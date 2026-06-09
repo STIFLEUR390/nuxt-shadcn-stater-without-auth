@@ -7,7 +7,7 @@ import { GalleryVerticalEnd } from "@lucide/vue"
     <div class="container mx-auto px-4 py-12">
       <div class="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
         <!-- Brand -->
-        <div class="space-y-3">
+        <div class="flex flex-col gap-3">
           <NuxtLink to="/" class="flex items-center gap-2 font-semibold">
             <div
               class="bg-primary text-primary-foreground flex size-7 items-center justify-center rounded-md"
@@ -23,9 +23,9 @@ import { GalleryVerticalEnd } from "@lucide/vue"
         </div>
 
         <!-- Product -->
-        <div class="space-y-3">
+        <div class="flex flex-col gap-3">
           <h3 class="text-sm font-semibold">Product</h3>
-          <ul class="space-y-2">
+          <ul class="flex flex-col gap-2">
             <li>
               <NuxtLink
                 to="/#features"
@@ -62,9 +62,9 @@ import { GalleryVerticalEnd } from "@lucide/vue"
         </div>
 
         <!-- Company -->
-        <div class="space-y-3">
+        <div class="flex flex-col gap-3">
           <h3 class="text-sm font-semibold">Company</h3>
-          <ul class="space-y-2">
+          <ul class="flex flex-col gap-2">
             <li>
               <a
                 href="#"
@@ -101,9 +101,9 @@ import { GalleryVerticalEnd } from "@lucide/vue"
         </div>
 
         <!-- Legal -->
-        <div class="space-y-3">
+        <div class="flex flex-col gap-3">
           <h3 class="text-sm font-semibold">Legal</h3>
-          <ul class="space-y-2">
+          <ul class="flex flex-col gap-2">
             <li>
               <a
                 href="#"

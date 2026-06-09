@@ -65,8 +65,8 @@ const mobileMenuOpen = ref(false)
         class="md:hidden"
         @click="mobileMenuOpen = !mobileMenuOpen"
       >
-        <Menu v-if="!mobileMenuOpen" class="size-5" />
-        <X v-else class="size-5" />
+        <Menu v-if="!mobileMenuOpen" />
+        <X v-else />
       </UiButton>
     </div>
 

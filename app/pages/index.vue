@@ -198,9 +198,9 @@ const faqs = [
         </p>
         <div class="flex flex-col gap-3 sm:flex-row">
           <NuxtLink to="/auth/signup">
-            <UiButton size="lg" class="gap-2">
+            <UiButton size="lg">
               Get Started Free
-              <ArrowRight class="size-4" />
+              <ArrowRight data-icon="inline-end" />
             </UiButton>
           </NuxtLink>
           <NuxtLink to="/#features">
@@ -370,7 +370,7 @@ const faqs = [
               <UiCardTitle>{{ plan.name }}</UiCardTitle>
               <UiCardDescription>{{ plan.description }}</UiCardDescription>
             </UiCardHeader>
-            <UiCardContent class="space-y-4">
+            <UiCardContent class="flex flex-col gap-4">
               <div class="flex items-baseline gap-1">
                 <span class="text-4xl font-extrabold">{{ plan.price }}</span>
                 <span
@@ -380,7 +380,7 @@ const faqs = [
                   {{ plan.period }}
                 </span>
               </div>
-              <ul class="space-y-2">
+              <ul class="flex flex-col gap-2">
                 <li
                   v-for="feature in plan.features"
                   :key="feature"
@@ -514,10 +514,9 @@ const faqs = [
                 <UiButton
                   variant="secondary"
                   size="lg"
-                  class="gap-2"
                 >
                   Start Free Trial
-                  <ArrowRight class="size-4" />
+                  <ArrowRight data-icon="inline-end" />
                 </UiButton>
               </NuxtLink>
               <NuxtLink to="/#features">
