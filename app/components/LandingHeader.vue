@@ -56,6 +56,7 @@ const mobileMenuOpen = ref(false)
         <NuxtLink to="/auth/signup">
           <UiButton size="sm">Get Started</UiButton>
         </NuxtLink>
+        <ModeToggle />
       </div>
 
       <!-- Mobile toggle -->
@@ -111,6 +112,9 @@ const mobileMenuOpen = ref(false)
         <NuxtLink to="/auth/signup" @click="mobileMenuOpen = false">
           <UiButton class="w-full">Get Started</UiButton>
         </NuxtLink>
+        <div class="flex justify-center pt-1">
+          <ModeToggle />
+        </div>
       </nav>
     </div>
   </header>
