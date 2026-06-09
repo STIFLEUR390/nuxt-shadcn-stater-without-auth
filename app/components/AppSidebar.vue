@@ -1,4 +1,16 @@
 <script setup lang="ts">
+import {
+  AudioWaveform,
+  BookOpen,
+  Bot,
+  Command,
+  Frame,
+  GalleryVerticalEnd,
+  Map,
+  PieChart,
+  Settings2,
+  SquareTerminal,
+} from "@lucide/vue";
 import type { SidebarProps } from "@/components/ui/sidebar";
 
 const props = withDefaults(defineProps<SidebarProps>(), {
@@ -137,17 +149,17 @@ const data = {
 </script>
 
 <template>
-  <Sidebar v-bind="props">
-    <SidebarHeader>
+  <UiSidebar v-bind="props">
+    <UiSidebarHeader>
       <TeamSwitcher :teams="data.teams" />
-    </SidebarHeader>
-    <SidebarContent>
+    </UiSidebarHeader>
+    <UiSidebarContent>
       <NavMain :items="data.navMain" />
       <NavProjects :projects="data.projects" />
-    </SidebarContent>
-    <SidebarFooter>
+    </UiSidebarContent>
+    <UiSidebarFooter>
       <NavUser :user="data.user" />
-    </SidebarFooter>
-    <SidebarRail />
-  </Sidebar>
+    </UiSidebarFooter>
+    <UiSidebarRail />
+  </UiSidebar>
 </template>

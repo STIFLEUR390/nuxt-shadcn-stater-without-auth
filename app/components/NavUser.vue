@@ -24,11 +24,11 @@ const { isMobile } = useSidebar();
 </script>
 
 <template>
-  <SidebarMenu>
-    <SidebarMenuItem>
-      <DropdownMenu>
-        <DropdownMenuTrigger as-child>
-          <SidebarMenuButton
+  <UiSidebarMenu>
+    <UiSidebarMenuItem>
+      <UiDropdownMenu>
+        <UiDropdownMenuTrigger as-child>
+          <UiSidebarMenuButton
             size="lg"
             class="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
           >
@@ -41,15 +41,15 @@ const { isMobile } = useSidebar();
               <span class="truncate text-xs">{{ user.email }}</span>
             </div>
             <ChevronsUpDown class="ml-auto size-4" />
-          </SidebarMenuButton>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent
+          </UiSidebarMenuButton>
+        </UiDropdownMenuTrigger>
+        <UiDropdownMenuContent
           class="w-(--reka-dropdown-menu-trigger-width) min-w-56 rounded-lg"
           :side="isMobile ? 'bottom' : 'right'"
           align="end"
           :side-offset="4"
         >
-          <DropdownMenuLabel class="p-0 font-normal">
+          <UiDropdownMenuLabel class="p-0 font-normal">
             <div class="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
               <Avatar class="h-8 w-8 rounded-lg">
                 <AvatarImage :src="user.avatar" :alt="user.name" />
@@ -60,36 +60,36 @@ const { isMobile } = useSidebar();
                 <span class="truncate text-xs">{{ user.email }}</span>
               </div>
             </div>
-          </DropdownMenuLabel>
-          <DropdownMenuSeparator />
-          <DropdownMenuGroup>
-            <DropdownMenuItem>
+          </UiDropdownMenuLabel>
+          <UiDropdownMenuSeparator />
+          <UiDropdownMenuGroup>
+            <UiDropdownMenuItem>
               <Sparkles />
               Upgrade to Pro
-            </DropdownMenuItem>
-          </DropdownMenuGroup>
-          <DropdownMenuSeparator />
-          <DropdownMenuGroup>
-            <DropdownMenuItem>
+            </UiDropdownMenuItem>
+          </UiDropdownMenuGroup>
+          <UiDropdownMenuSeparator />
+          <UiDropdownMenuGroup>
+            <UiDropdownMenuItem>
               <BadgeCheck />
               Account
-            </DropdownMenuItem>
-            <DropdownMenuItem>
+            </UiDropdownMenuItem>
+            <UiDropdownMenuItem>
               <CreditCard />
               Billing
-            </DropdownMenuItem>
-            <DropdownMenuItem>
+            </UiDropdownMenuItem>
+            <UiDropdownMenuItem>
               <Bell />
               Notifications
-            </DropdownMenuItem>
-          </DropdownMenuGroup>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem>
+            </UiDropdownMenuItem>
+          </UiDropdownMenuGroup>
+          <UiDropdownMenuSeparator />
+          <UiDropdownMenuItem>
             <LogOut />
             Log out
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
-    </SidebarMenuItem>
-  </SidebarMenu>
+          </UiDropdownMenuItem>
+        </UiDropdownMenuContent>
+      </UiDropdownMenu>
+    </UiSidebarMenuItem>
+  </UiSidebarMenu>
 </template>

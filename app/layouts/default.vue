@@ -1,5 +1,5 @@
 <template>
-  <SidebarProvider>
+  <UiSidebarProvider>
     <AppSidebar />
-  </SidebarProvider>
+  </UiSidebarProvider>
 </template>

@@ -12,13 +12,11 @@
         <UiBreadcrumb>
           <UiBreadcrumbList>
             <UiBreadcrumbItem class="hidden md:block">
-              <UiBreadcrumbLink href="#">
-                Building Your Application
-              </UiBreadcrumbLink>
+              <UiBreadcrumbLink href="#"> Admin </UiBreadcrumbLink>
             </UiBreadcrumbItem>
             <UiBreadcrumbSeparator class="hidden md:block" />
             <UiBreadcrumbItem>
-              <UiBreadcrumbPage>Data Fetching</UiBreadcrumbPage>
+              <UiBreadcrumbPage>Dashboard</UiBreadcrumbPage>
             </UiBreadcrumbItem>
           </UiBreadcrumbList>
         </UiBreadcrumb>

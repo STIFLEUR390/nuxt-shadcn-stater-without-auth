@@ -16,50 +16,50 @@ const { isMobile } = useSidebar();
 </script>
 
 <template>
-  <SidebarGroup class="group-data-[collapsible=icon]:hidden">
-    <SidebarGroupLabel>Projects</SidebarGroupLabel>
-    <SidebarMenu>
-      <SidebarMenuItem v-for="item in projects" :key="item.name">
-        <SidebarMenuButton as-child>
+  <UiSidebarGroup class="group-data-[collapsible=icon]:hidden">
+    <UiSidebarGroupLabel>Projects</UiSidebarGroupLabel>
+    <UiSidebarMenu>
+      <UiSidebarMenuItem v-for="item in projects" :key="item.name">
+        <UiSidebarMenuButton as-child>
           <a :href="item.url">
             <component :is="item.icon" />
             <span>{{ item.name }}</span>
           </a>
-        </SidebarMenuButton>
-        <DropdownMenu>
-          <DropdownMenuTrigger as-child>
-            <SidebarMenuAction show-on-hover>
+        </UiSidebarMenuButton>
+        <UiDropdownMenu>
+          <UiDropdownMenuTrigger as-child>
+            <UiSidebarMenuAction show-on-hover>
               <MoreHorizontal />
               <span class="sr-only">More</span>
-            </SidebarMenuAction>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent
+            </UiSidebarMenuAction>
+          </UiDropdownMenuTrigger>
+          <UiDropdownMenuContent
             class="w-48 rounded-lg"
             :side="isMobile ? 'bottom' : 'right'"
             :align="isMobile ? 'end' : 'start'"
           >
-            <DropdownMenuItem>
+            <UiDropdownMenuItem>
               <Folder class="text-muted-foreground" />
               <span>View Project</span>
-            </DropdownMenuItem>
-            <DropdownMenuItem>
+            </UiDropdownMenuItem>
+            <UiDropdownMenuItem>
               <Forward class="text-muted-foreground" />
               <span>Share Project</span>
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem>
+            </UiDropdownMenuItem>
+            <UiDropdownMenuSeparator />
+            <UiDropdownMenuItem>
               <Trash2 class="text-muted-foreground" />
               <span>Delete Project</span>
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </SidebarMenuItem>
-      <SidebarMenuItem>
-        <SidebarMenuButton class="text-sidebar-foreground/70">
+            </UiDropdownMenuItem>
+          </UiDropdownMenuContent>
+        </UiDropdownMenu>
+      </UiSidebarMenuItem>
+      <UiSidebarMenuItem>
+        <UiSidebarMenuButton class="text-sidebar-foreground/70">
           <MoreHorizontal class="text-sidebar-foreground/70" />
           <span>More</span>
-        </SidebarMenuButton>
-      </SidebarMenuItem>
-    </SidebarMenu>
-  </SidebarGroup>
+        </UiSidebarMenuButton>
+      </UiSidebarMenuItem>
+    </UiSidebarMenu>
+  </UiSidebarGroup>
 </template>
