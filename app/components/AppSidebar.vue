@@ -158,10 +158,6 @@ const data = {
       <NavProjects :projects="data.projects" />
     </UiSidebarContent>
     <UiSidebarFooter>
-      <div class="flex items-center justify-between px-2 pb-2">
-        <span />
-        <ModeToggle />
-      </div>
       <NavUser :user="data.user" />
     </UiSidebarFooter>
     <UiSidebarRail />

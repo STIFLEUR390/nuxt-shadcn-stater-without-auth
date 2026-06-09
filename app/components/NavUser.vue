@@ -5,7 +5,10 @@ import {
   ChevronsUpDown,
   CreditCard,
   LogOut,
+  Monitor,
+  Moon,
   Sparkles,
+  Sun,
 } from "@lucide/vue";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -21,6 +24,7 @@ const props = defineProps<{
 }>();
 
 const { isMobile } = useSidebar();
+const colorMode = useColorMode();
 </script>
 
 <template>
@@ -81,6 +85,21 @@ const { isMobile } = useSidebar();
             <UiDropdownMenuItem>
               <Bell />
               Notifications
+            </UiDropdownMenuItem>
+          </UiDropdownMenuGroup>
+          <UiDropdownMenuSeparator />
+          <UiDropdownMenuGroup>
+            <UiDropdownMenuItem @click="colorMode.preference = 'light'">
+              <Sun />
+              Light
+            </UiDropdownMenuItem>
+            <UiDropdownMenuItem @click="colorMode.preference = 'dark'">
+              <Moon />
+              Dark
+            </UiDropdownMenuItem>
+            <UiDropdownMenuItem @click="colorMode.preference = 'system'">
+              <Monitor />
+              System
             </UiDropdownMenuItem>
           </UiDropdownMenuGroup>
           <UiDropdownMenuSeparator />
