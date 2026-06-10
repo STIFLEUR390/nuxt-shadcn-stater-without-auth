@@ -167,6 +167,238 @@ console.log(response.value?.headers)            // Headers
 console.log(response.value?.data)              // Le body
 ```
 
+## 🌐 Gérer plusieurs APIs / services
+
+Quand ton application consomme 2, 3 services différents (ex: une API REST, un CMS headless, un service de paiement), chacun avec sa propre spec OpenAPI et son propre `baseUrl`, voici les approches possibles.
+
+### Approche 1 : Une spec par service (recommandé)
+
+Le module accepte un tableau de configurations. Chaque entrée a son propre fichier OpenAPI, son dossier de sortie et son `baseUrl`.
+
+```ts
+// nuxt.config.ts
+export default defineNuxtConfig({
+  modules: ['nuxt-openapi-hyperfetch'],
+
+  openapi: [
+    {
+      input: './openapi-spec/posts-api.yaml',
+      output: './openapi/posts',
+      baseUrl: 'https://posts-api.mon-domaine.com',
+      generators: ['useFetch', 'useAsyncData'],
+    },
+    {
+      input: './openapi-spec/users-api.yaml',
+      output: './openapi/users',
+      baseUrl: 'https://users-api.mon-domaine.com',
+      generators: ['useFetch', 'useAsyncData', 'connectors'],
+    },
+    {
+      input: './openapi-spec/payment-api.yaml',
+      output: './openapi/payment',
+      baseUrl: 'https://payment.mon-domaine.com',
+      generators: ['useFetch'],
+    },
+  ],
+
+  runtimeConfig: {
+    public: {
+      // Fallback global — chaque spec peut override
+      apiBaseUrl: 'https://api.mon-domaine.com',
+    },
+  },
+})
+```
+
+Structure générée :
+
+```
+openapi/
+├── posts/
+│   ├── client.gen.ts
+│   ├── sdk.gen.ts
+│   ├── types.gen.ts
+│   └── composables/
+│       ├── use-fetch/
+│       │   └── composables/
+│       │       ├── useFetchListPosts.ts
+│       │       └── ...
+│       └── use-async-data/
+│           └── ...
+├── users/
+│   ├── ...
+│   └── composables/
+│       ├── use-fetch/...
+│       └── connectors/
+│           └── useUsersConnector.ts
+└── payment/
+    └── composables/
+        └── use-fetch/...
+```
+
+> ⚠️ Chaque service a son propre dossier `output`. Les composables sont auto-importés indépendamment.
+
+### Approche 2 : Une seule spec avec `baseURL` par appel
+
+Si tous tes services sont décrits dans une seule spec ouverte (avec plusieurs `servers`), tu peux override le `baseURL` au cas par cas via le paramètre `baseURL` du composable :
+
+```ts
+// Appel vers le serveur de prod
+const { data: posts } = useFetchListPosts({}, {
+  baseURL: 'https://prod-api.mon-domaine.com',
+})
+
+// Appel vers le serveur de staging
+const { data: draftPosts } = useFetchListPosts({}, {
+  baseURL: 'https://staging-api.mon-domaine.com',
+})
+```
+
+Ordre de résolution du `baseURL` :
+1. `baseURL` passé en option du composable (prioritaire)
+2. `baseUrl` configuré dans la section `openapi` de `nuxt.config.ts`
+3. `runtimeConfig.public.apiBaseUrl` (fallback global)
+
+### Approche 3 : Runtime switching (prod / staging / local)
+
+Pour basculer entre environnements au runtime :
+
+```ts
+// nuxt.config.ts
+export default defineNuxtConfig({
+  runtimeConfig: {
+    public: {
+      // Utilisé comme fallback par tous les composables générés
+      apiBaseUrl: process.env.NUXT_PUBLIC_API_BASE_URL || 'http://localhost:8080',
+    },
+  },
+})
+```
+
+```bash
+# .env (local)
+NUXT_PUBLIC_API_BASE_URL=http://localhost:8080
+
+# .env.staging
+NUXT_PUBLIC_API_BASE_URL=https://staging-api.mon-domaine.com
+
+# .env.production
+NUXT_PUBLIC_API_BASE_URL=https://api.mon-domaine.com
+```
+
+Ou via un composable helper :
+
+```ts
+// composables/useApiBaseUrl.ts
+export const useApiBaseUrl = (service: 'posts' | 'users' | 'payment') => {
+  const config = useRuntimeConfig()
+  const env = useCookie('api-env') // 'prod' | 'staging' | 'dev'
+
+  const urls: Record<string, Record<string, string>> = {
+    dev: {
+      posts: 'http://localhost:3001',
+      users: 'http://localhost:3002',
+      payment: 'http://localhost:3003',
+    },
+    staging: {
+      posts: 'https://staging-posts.mon-domaine.com',
+      users: 'https://staging-users.mon-domaine.com',
+      payment: 'https://staging-payment.mon-domaine.com',
+    },
+    production: {
+      posts: 'https://posts.mon-domaine.com',
+      users: 'https://users.mon-domaine.com',
+      payment: 'https://payment.mon-domaine.com',
+    },
+  }
+
+  return urls[env.value ?? 'production'][service]
+}
+```
+
+Utilisation :
+
+```ts
+const apiUrl = useApiBaseUrl('posts')
+const { data: posts } = useFetchListPosts({}, { baseURL: apiUrl })
+```
+
+### Approche 4 : Auth différente par service
+
+Quand chaque service a sa propre méthode d'authentification, combine les callbacks globaux avec des filtres par URL :
+
+```ts
+// plugins/api-callbacks.ts
+export default defineNuxtPlugin(() => {
+  return {
+    provide: {
+      getGlobalApiCallbacks: () => [
+        // Service Posts : Bearer token classique
+        {
+          patterns: ['https://posts-api.mon-domaine.com/**'],
+          onRequest: ({ headers }) => {
+            const token = useCookie('auth-token').value
+            return { headers: { ...headers, Authorization: `Bearer ${token}` } }
+          },
+        },
+
+        // Service Payment : API Key
+        {
+          patterns: ['https://payment.mon-domaine.com/**'],
+          onRequest: ({ headers }) => ({
+            headers: {
+              ...headers,
+              'X-API-Key': useRuntimeConfig().public.paymentApiKey,
+            },
+          }),
+        },
+
+        // Service Users : Keycloak
+        {
+          patterns: ['https://users-api.mon-domaine.com/**'],
+          onRequest: ({ headers }) => {
+            const { keycloak } = useKeycloak()
+            if (!keycloak.authenticated) throw new Error('Not authenticated')
+            return {
+              headers: {
+                ...headers,
+                Authorization: `Bearer ${keycloak.token}`,
+              },
+            }
+          },
+          onError: (error) => {
+            if (error.status === 401) {
+              const { keycloak } = useKeycloak()
+              keycloak.login()
+              return false
+            }
+          },
+        },
+
+        // Règle globale sans filtre : s'applique à tous
+        {
+          onError: (error) => {
+            if (error.status >= 500) {
+              useToast().error('Erreur serveur')
+            }
+          },
+        },
+      ],
+    },
+  }
+})
+```
+
+### Résumé : quelle approche choisir ?
+
+| Situation | Approche |
+|-----------|----------|
+| 1 service | Config simple, pas besoin de multi |
+| 2-3 services, specs séparées | **Approche 1** (tableau de configs) |
+| Même service, environnements différents | **Approche 3** (runtime switching) |
+| Auth différente par service | **Approche 4** (callbacks filtrés) |
+| Override ponctuel | **Approche 2** (`baseURL` par appel) |
+
 ## 🔐 Authentification
 
 ### Approche 1 : Par requête (locale)
