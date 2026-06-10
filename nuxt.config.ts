@@ -5,8 +5,29 @@ export default defineNuxtConfig({
   compatibilityDate: '2025-01-01',
   vite: {
     plugins: [tailwindcss()],
+    optimizeDeps: {
+      include: [
+        '@lucide/vue',
+        '@vue/devtools-core',
+        '@vue/devtools-kit',
+        'clsx',
+        'tailwind-merge',
+        'vue-sonner',
+        'class-variance-authority',
+        '@vueuse/core',
+        'reka-ui',
+      ],
+    },
   },
   modules: ['shadcn-nuxt', '@nuxtjs/color-mode', '@vite-pwa/nuxt', 'nuxt-openapi-hyperfetch'],
+  /**
+   * Nuxt auto-imports configuration.
+   * Exclude connector barrel index files to avoid duplicate import warnings
+   * when nuxt-openapi-hyperfetch generates connectors.
+   */
+  imports: {
+    ignore: ['openapi/composables/connectors/index'],
+  },
   colorMode: {
     classSuffix: '',
   },
