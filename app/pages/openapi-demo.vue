@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { Post } from '~/openapi/types.gen'
+import { createPost, deletePost, updatePost } from '../../openapi/sdk.gen'
 
 /**
  * Demo page for nuxt-openapi-hyperfetch
@@ -11,6 +12,20 @@ definePageMeta({ layout: 'default' })
 
 // ─── List posts (useFetch variant, SSR-friendly) ───
 const { data: posts, pending, error, refresh } = useFetchListPosts({})
+
+// ─── Pagination ───
+const postsPerPage = 10
+const currentPage = ref(1)
+const totalPages = computed(() => Math.ceil((posts.value?.length ?? 0) / postsPerPage))
+
+const paginatedPosts = computed(() => {
+  const start = (currentPage.value - 1) * postsPerPage
+  return (posts.value ?? []).slice(start, start + postsPerPage)
+})
+
+function goToPage(page: number) {
+  currentPage.value = Math.max(1, Math.min(page, totalPages.value))
+}
 
 // ─── Get single post (useAsyncData variant, raw response) ───
 const selectedId = ref<number | null>(null)
@@ -128,7 +143,7 @@ async function handleDelete(id: number) {
 
         <div v-else class="space-y-2">
           <div
-            v-for="post in posts ?? []"
+            v-for="post in paginatedPosts"
             :key="post.id"
             class="rounded-lg border p-4 transition-colors hover:bg-muted/50"
           >
@@ -182,8 +197,51 @@ async function handleDelete(id: number) {
             </div>
           </div>
 
-          <div v-if="(posts ?? []).length === 0" class="py-8 text-center text-muted-foreground">
+          <div v-if="paginatedPosts.length === 0" class="py-8 text-center text-muted-foreground">
             Aucun post trouvé.
+          </div>
+
+          <!-- Pagination controls -->
+          <div v-if="totalPages > 1" class="flex items-center justify-center gap-2 pt-6">
+            <UiButton
+              variant="outline"
+              size="sm"
+              :disabled="currentPage <= 1"
+              @click="goToPage(currentPage - 1)"
+            >
+              ← Précédent
+            </UiButton>
+
+            <div class="flex items-center gap-1">
+              <template v-for="page in totalPages" :key="page">
+                <UiButton
+                  v-if="page === 1 || page === totalPages || Math.abs(page - currentPage) <= 1"
+                  :variant="page === currentPage ? 'default' : 'outline'"
+                  size="sm"
+                  class="min-w-[2rem]"
+                  @click="goToPage(page)"
+                >
+                  {{ page }}
+                </UiButton>
+                <span
+                  v-else-if="Math.abs(page - currentPage) === 2"
+                  class="px-1 text-muted-foreground"
+                >…</span>
+              </template>
+            </div>
+
+            <UiButton
+              variant="outline"
+              size="sm"
+              :disabled="currentPage >= totalPages"
+              @click="goToPage(currentPage + 1)"
+            >
+              Suivant →
+            </UiButton>
+          </div>
+
+          <div class="pt-4 text-center text-xs text-muted-foreground">
+            {{ posts?.length ?? 0 }} posts · page {{ currentPage }} sur {{ totalPages || 1 }}
           </div>
         </div>
       </ClientOnly>

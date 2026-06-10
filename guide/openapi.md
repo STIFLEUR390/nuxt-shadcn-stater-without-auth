@@ -116,6 +116,29 @@ const { data: post } = useAsyncDataGetPostById(
 
 ### Création (mutation)
 
+Les fonctions SDK sont le moyen le plus simple pour les mutations déclenchées par l'utilisateur :
+
+```vue
+<script setup lang="ts">
+import { createPost } from '../../openapi/sdk.gen'
+
+const title = ref('')
+const body = ref('')
+
+async function handleCreate() {
+  const result = await createPost({
+    body: { title: title.value, body: body.value, userId: 1 },
+  })
+  console.log('Créé :', result.data.id)
+  title.value = ''
+  body.value = ''
+  refresh() // Recharger la liste
+}
+</script>
+```
+
+Alternative avec le composable (nécessite `immediate: false`) :
+
 ```vue
 <script setup lang="ts">
 const title = ref('')
@@ -132,26 +155,30 @@ const { execute: create, pending } = useFetchCreatePost(
 </script>
 ```
 
+> 💡 **Recommandation** : Pour les mutations, les fonctions SDK sont plus simples (pas de `immediate: false`, pas de `execute()`). Réserve les composables `useFetch*` aux listes GET où tu as besoin du state réactif (`pending`, `error`, `refresh`).
+
 ### Mise à jour
 
 ```ts
-const { execute: update } = useFetchUpdatePost(
-  { path: { postId: 42 }, body: { title: 'Nouveau titre', userId: 1 } },
-  { immediate: false }
-)
+import { updatePost } from '../../openapi/sdk.gen'
+
+async function handleUpdate(postId: number, title: string) {
+  await updatePost({
+    path: { postId },
+    body: { title, userId: 1 },
+  })
+  refresh()
+}
 ```
 
 ### Suppression
 
 ```ts
-const { execute: del } = useFetchDeletePost(
-  { path: { postId: 42 } },
-  { immediate: false },
-)
+import { deletePost } from '../../openapi/sdk.gen'
 
-async function handleDelete() {
-  await del()
-  refresh() // Recharger la liste après suppression
+async function handleDelete(id: number) {
+  await deletePost({ path: { postId: id } })
+  refresh()
 }
 ```
 
@@ -792,6 +819,59 @@ runtimeConfig: {
 }
 ```
 
+## 📄 Pagination
+
+Le runtime `useApiRequest` intègre un système de pagination natif (sans dépendance externe).
+
+### Pagination intégrée au composable
+
+Active `paginated: true` et le composable expose automatiquement :
+
+| Propriété | Type | Description |
+|-----------|------|-------------|
+| `pagination.page` | `ComputedRef<number>` | Page courante |
+| `pagination.perPage` | `ComputedRef<number>` | Éléments par page |
+| `pagination.hasNextPage` | `ComputedRef<boolean>` | Page suivante disponible |
+| `pagination.hasPrevPage` | `ComputedRef<boolean>` | Page précédente disponible |
+| `nextPage()` | `() => void` | Aller à la page suivante |
+| `prevPage()` | `() => void` | Aller à la page précédente |
+| `goToPage(n)` | `(page: number) => void` | Aller à une page spécifique |
+| `setPerPage(n)` | `(pageSize: number) => void` | Changer le nombre d'éléments |
+
+```vue
+<script setup lang="ts">
+const {
+  data: posts,
+  pagination: { page, perPage, hasNextPage, hasPrevPage, nextPage, prevPage, goToPage },
+} = useFetchListPosts({}, { paginated: true, initialPerPage: 10 })
+</script>
+
+<template>
+  <div v-for="post in posts" :key="post.id">{{ post.title }}</div>
+
+  <div class="flex gap-2">
+    <button :disabled="!hasPrevPage" @click="prevPage">← Précédent</button>
+    <span>Page {{ page }}</span>
+    <button :disabled="!hasNextPage" @click="nextPage">Suivant →</button>
+  </div>
+</template>
+```
+
+### Pagination manuelle (côté client)
+
+Alternative quand l'API ne supporte pas nativement `_page`/`_limit` :
+
+```ts
+const postsPerPage = 10
+const currentPage = ref(1)
+const totalPages = computed(() => Math.ceil((posts.value?.length ?? 0) / postsPerPage))
+const paginatedPosts = computed(() =>
+  (posts.value ?? []).slice((currentPage.value - 1) * postsPerPage, currentPage.value * postsPerPage)
+)
+```
+
+> **Quand utiliser l'une ou l'autre ?** Privilégie `paginated: true` si ton API supporte les paramètres de pagination (`_page`, `_limit`, `page`, `perPage`, etc.). Utilise la pagination client-side si l'API renvoie toutes les données d'un coup et que le volume est raisonnable (quelques centaines d'éléments max).
+
 ## 🔌 Connecteurs (CRUD headless)
 
 Les connecteurs groupent les opérations CRUD pour une ressource dans un seul composable.
@@ -905,7 +985,49 @@ describe('Posts API', async () => {
 })
 ```
 
+## 📊 Auto-import : composables vs SDK
+
+### Composables `use*` → auto-importés ✅
+
+Tous les composables générés avec le préfixe `use*` sont automatiquement disponibles dans les composants Vue, sans `import` :
+
+```ts
+// ✅ Utilisable directement
+const { data: posts, pending, error, refresh } = useFetchListPosts({})
+const { data: post } = useAsyncDataGetPostById({ path: { postId: 1 } })
+```
+
+### Fonctions SDK → à importer manuellement ⚠️
+
+Les fonctions du SDK (`createPost`, `deletePost`, `updatePost`, `listPosts`, `getPostById`) **ne sont pas auto-importées**. Elles doivent être importées explicitement :
+
+```ts
+import { createPost, deletePost, updatePost } from '../../openapi/sdk.gen'
+```
+
+> ⚠️ L'alias `~/openapi/sdk.gen` peut échouer en dev (500) — le chemin relatif est plus fiable.
+
+### Quand utiliser quoi ?
+
+| Cas d'usage | Utilise | Pourquoi |
+|-------------|---------|----------|
+| Liste GET (SSR) | `useFetchListPosts({})` | Auto-importé, SSR-friendly, `pending`/`error`/`refresh` |
+| Détail GET | `useAsyncDataGetPostById(...)` | Cache key, contrôle fin du fetch |
+| Création POST | `createPost(...)` (SDK) | Simple fonction async, pas de `immediate: false` à gérer |
+| Mise à jour PATCH | `updatePost(...)` (SDK) | Idem, plus léger qu'un composable |
+| Suppression DELETE | `deletePost(...)` (SDK) | Idem |
+
+> **Pourquoi les fonctions SDK pour les mutations ?** Les composables `useFetchCreatePost`, `useFetchUpdatePost`, `useFetchDeletePost` s'exécutent immédiatement par défaut. Pour des actions utilisateur (clic bouton), il faut `immediate: false` + `execute()`, ce qui est plus verbeux que d'appeler directement la fonction SDK.
+
 ## 🐛 Dépannage
+
+### "createPost is not defined"
+
+La fonction SDK n'est pas auto-importée. Ajoute l'import :
+
+```ts
+import { createPost } from '../../openapi/sdk.gen'
+```
 
 ### "useFetchListPosts is not defined"
 
@@ -927,6 +1049,36 @@ describe('Posts API', async () => {
 - Vérifie que l'OpenAPI spec a les bons `operationId`
 - Les endpoints sans `operationId` reçoivent des noms générés automatiquement
 - En mode `manual`, seules les opérations déclarées sont générées
+
+### "500 Server Error" à cause d'un import `~/openapi/...`
+
+L'alias `~` peut ne pas être résolu par Vite pour les imports dans le dossier `openapi/`. Utilise un chemin relatif :
+
+```ts
+// ❌ Peut causer une 500
+import { createPost } from '~/openapi/sdk.gen'
+
+// ✅ Fiable
+import { createPost } from '../../openapi/sdk.gen'
+```
+
+### Appel API fantôme avec `useAsyncData` + valeur par défaut falsy
+
+Si un paramètre de chemin est `null` ou `0` au SSR, le composable déclenche quand même un appel API avec cette valeur. Solution :
+
+```ts
+// ❌ Appelle /posts/0 au SSR → 404
+const selectedId = ref<number | null>(null)
+const { data } = useAsyncDataGetPostById(
+  computed(() => ({ path: { postId: selectedId.value ?? 0 } }))
+)
+
+// ✅ Pas d'appel au SSR
+const { data } = useAsyncDataGetPostById(
+  computed(() => ({ path: { postId: selectedId.value ?? 0 } })),
+  { lazy: true, server: false }
+)
+```
 
 ### "baseUrl n'est pas pris en compte"
 
