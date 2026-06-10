@@ -1,6 +1,8 @@
 # Nuxt Shadcn OpenAPI
 
-Application full-stack moderne construite avec **Nuxt 4**, **Vue 3**, **shadcn-vue** (Reka UI), **Tailwind CSS v4** et intégration **OpenAPI** via `nuxt-openapi-hyperfetch`.
+Application full-stack moderne construite avec **Nuxt 4**, **Vue 3**, **shadcn-vue** (Reka UI), **Tailwind CSS v4**, **PWA** via `@vite-pwa/nuxt` et intégration **OpenAPI** via `nuxt-openapi-hyperfetch`.
+
+> 🔧 Utilisable comme **template GitHub** — consulte le [guide](./guide/) pour personnaliser le PWA, l'architecture (full-stack / frontend-only / API-only) et plus.
 
 ## ✨ Fonctionnalités
 
@@ -11,7 +13,9 @@ Application full-stack moderne construite avec **Nuxt 4**, **Vue 3**, **shadcn-v
 - 🏠 **Landing page** — page d'accueil SaaS avec sections features, pricing, témoignages, FAQ et CTA
 - 🔌 **OpenAPI** — client API auto-généré avec `nuxt-openapi-hyperfetch`
 - ✅ **Validation** — formulaires validés avec `vee-validate` + `zod`
+- 📱 **PWA** — Progressive Web App avec `@vite-pwa/nuxt`, mode offline, icônes, manifest, mise à jour automatique
 - 🧩 **Composition API** — tout en `<script setup lang="ts">` avec TypeScript
+- 📘 **Guide** — documentation dans `guide/` pour configurer/supprimer le PWA et adapter l'architecture
 
 ## 📦 Stack technique
 
@@ -27,6 +31,7 @@ Application full-stack moderne construite avec **Nuxt 4**, **Vue 3**, **shadcn-v
 | Tableaux | [TanStack Vue Table](https://tanstack.com/table) |
 | Carrousel | [embla-carousel-vue](https://embla-carousel.vercel.app) |
 | Notifications | [vue-sonner](https://vue-sonner.vercel.app) |
+| PWA | [@vite-pwa/nuxt](https://vite-pwa-org.netlify.app/frameworks/nuxt) |
 | Utilitaires | [VueUse](https://vueuse.org), clsx, tailwind-merge, class-variance-authority |
 
 ## 🚀 Démarrage rapide
@@ -116,11 +121,14 @@ bun run preview
 │       │   └── index.vue             # Dashboard utilisateur
 │       └── admin/
 │           └── index.vue             # Dashboard administrateur
+├── guide/                           # Guides de configuration
+│   ├── README.md
+│   ├── pwa.md                       # Configurer/désactiver le PWA
+│   └── architecture.md              # Full-stack, frontend-only, API-only
 ├── public/                           # Assets statiques
 ├── server/                           # Routes API server-side
 ├── nuxt.config.ts                    # Configuration Nuxt
 ├── components.json                   # Configuration shadcn-vue
-├── tailwind.config.ts                # Configuration Tailwind
 └── package.json
 ```
 

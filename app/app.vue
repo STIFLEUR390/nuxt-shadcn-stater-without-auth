@@ -4,6 +4,7 @@ import "vue-sonner/style.css"
 
 <template>
   <div>
+    <VitePwaManifest />
     <NuxtLayout>
       <NuxtPage />
     </NuxtLayout>
