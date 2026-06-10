@@ -67,13 +67,191 @@ icons: [
 ]
 ```
 
-### Générer les assets PWA automatiquement
+### 🎨 Générer les icônes PWA automatiquement
 
-Installe `@vite-pwa/assets-generator` et utilise-le :
+Le template utilise [`@vite-pwa/assets-generator`](https://vite-pwa-org.netlify.app/assets-generator/) pour produire toutes les icônes requises à partir d'un seul fichier SVG.
+
+#### 1. Installer le générateur
 
 ```bash
 bun add -D @vite-pwa/assets-generator
-npx pwa-assets-generator --preset minimal-2023 public/logo.svg
+```
+
+#### 2. Créer un logo source
+
+Place un fichier SVG dans `public/` (ex: `public/logo.svg`). Voici un exemple minimal :
+
+```svg
+<!-- public/logo.svg -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="128" fill="#10b981"/>
+  <text x="256" y="340" font-size="320" font-weight="bold"
+        font-family="Arial,sans-serif" fill="white" text-anchor="middle">
+    N
+  </text>
+</svg>
+```
+
+> 💡 Utilise un SVG comme source — il sera redimensionné sans perte de qualité.
+
+#### 3. Créer la configuration `pwa-assets.config.ts`
+
+```ts
+// pwa-assets.config.ts (à la racine du projet)
+import {
+  defineConfig,
+  minimal2023Preset as preset,
+} from '@vite-pwa/assets-generator/config'
+
+export default defineConfig({
+  headLinkOptions: {
+    preset: '2023',
+  },
+  preset,
+  images: ['public/logo.svg'],
+})
+```
+
+Le preset `minimal-2023` génère :
+
+| Type | Tailles | Nom du fichier |
+|------|---------|----------------|
+| Icône transparente | 64×64 | `pwa-64x64.png` |
+| Icône transparente | 192×192 | `pwa-192x192.png` |
+| Icône transparente | 512×512 | `pwa-512x512.png` |
+| Icône maskable | 512×512 | `maskable-icon-512x512.png` |
+| Apple touch icon | 180×180 | `apple-touch-icon-180x180.png` |
+| Favicon ICO | 48×48 | `favicon.ico` |
+
+#### 4. Ajouter le script dans `package.json`
+
+```json
+{
+  "scripts": {
+    "generate-pwa-assets": "pwa-assets-generator"
+  }
+}
+```
+
+#### 5. Lancer la génération
+
+```bash
+bun run generate-pwa-assets
+```
+
+Toutes les icônes sont créées dans `public/`, prêtes à être utilisées.
+
+#### 6. Mettre à jour `nuxt.config.ts`
+
+Après génération, vérifie que les icônes du manifest pointent bien vers les fichiers produits :
+
+```ts
+pwa: {
+  manifest: {
+    // ...
+    icons: [
+      {
+        src: 'pwa-64x64.png',
+        sizes: '64x64',
+        type: 'image/png',
+      },
+      {
+        src: 'pwa-192x192.png',
+        sizes: '192x192',
+        type: 'image/png',
+      },
+      {
+        src: 'pwa-512x512.png',
+        sizes: '512x512',
+        type: 'image/png',
+        purpose: 'any',
+      },
+      {
+        src: 'maskable-icon-512x512.png',
+        sizes: '512x512',
+        type: 'image/png',
+        purpose: 'maskable',
+      },
+    ],
+  },
+}
+```
+
+#### 7. (Optionnel) Icône dans `app.vue`
+
+Le générateur CLI affiche aussi les balises `<link>` à ajouter dans le `<head>`. Tu peux les intégrer dans `app.vue` :
+
+```vue
+<script setup>
+useHead({
+  link: [
+    { rel: 'icon', href: '/favicon.ico', sizes: '48x48' },
+    { rel: 'icon', href: '/favicon.svg', sizes: 'any', type: 'image/svg+xml' },
+    { rel: 'apple-touch-icon', href: '/apple-touch-icon-180x180.png' },
+  ],
+})
+</script>
+```
+
+> ⚠️ Si tu utilises `NuxtPwaAssets` (qui remplace `VitePwaManifest`), ces liens sont injectés automatiquement — pas besoin de `useHead`.
+
+#### Personnaliser le preset
+
+Tu peux créer ton propre preset dans `pwa-assets.config.ts` :
+
+```ts
+import { defineConfig } from '@vite-pwa/assets-generator/config'
+import type { Preset } from '@vite-pwa/assets-generator/config'
+
+const monPreset: Preset = {
+  transparent: {
+    sizes: [64, 192, 512],
+    favicons: [[48, 'favicon.ico']],
+    padding: 0.05,
+  },
+  maskable: {
+    sizes: [512],
+    padding: 0.3,
+  },
+  apple: {
+    sizes: [180],
+    padding: 0.3,
+  },
+}
+
+export default defineConfig({
+  headLinkOptions: { preset: '2023' },
+  preset: monPreset,
+  images: ['public/logo.svg'],
+})
+```
+
+#### Générer les splash screens iOS
+
+Pour ajouter les écrans de démarrage iOS :
+
+```ts
+import {
+  combinePresetAndAppleSplashScreens,
+  defineConfig,
+  minimal2023Preset,
+} from '@vite-pwa/assets-generator/config'
+
+export default defineConfig({
+  headLinkOptions: { preset: '2023' },
+  preset: combinePresetAndAppleSplashScreens(minimal2023Preset, {
+    padding: 0.3,
+    resizeOptions: { background: 'white', fit: 'contain' },
+    // Pour les splash screens en mode sombre :
+    darkResizeOptions: { background: 'black', fit: 'contain' },
+    linkMediaOptions: {
+      log: true,
+      addMediaScreen: true,
+      basePath: '/',
+    },
+  }),
+  images: ['public/logo.svg'],
+})
 ```
 
 ### Passer en mode "prompt" (demander avant mise à jour)
