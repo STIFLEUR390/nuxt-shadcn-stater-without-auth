@@ -6,7 +6,7 @@ export default defineNuxtConfig({
   vite: {
     plugins: [tailwindcss()],
   },
-  modules: ['shadcn-nuxt', '@nuxtjs/color-mode', '@vite-pwa/nuxt'],
+  modules: ['shadcn-nuxt', '@nuxtjs/color-mode', '@vite-pwa/nuxt', 'nuxt-openapi-hyperfetch'],
   colorMode: {
     classSuffix: '',
   },
@@ -63,6 +63,18 @@ export default defineNuxtConfig({
     },
     devOptions: {
       enabled: false,
+    },
+  },
+  openapi: {
+    input: './openapi-spec/jsonplaceholder.yaml',
+    output: './openapi',
+    generators: ['useFetch', 'useAsyncData', 'connectors'],
+    enableAutoImport: true,
+    baseUrl: 'https://jsonplaceholder.typicode.com',
+  },
+  runtimeConfig: {
+    public: {
+      apiBaseUrl: process.env.NUXT_PUBLIC_API_BASE_URL || 'https://jsonplaceholder.typicode.com',
     },
   },
 })

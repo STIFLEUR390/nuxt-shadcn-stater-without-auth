@@ -1,2 +1,4 @@
 node_modules
 .nuxt
+# OpenAPI generated files (regenerated on build)
+openapi/

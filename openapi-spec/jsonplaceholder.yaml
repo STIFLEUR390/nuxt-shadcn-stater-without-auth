@@ -1,0 +1,106 @@
+openapi: '3.0.2'
+info:
+  title: JSONPlaceholder
+  version: '1.0'
+servers:
+  - url: https://jsonplaceholder.typicode.com/
+
+components:
+  schemas:
+    Post:
+      type: object
+      properties:
+        userId:
+          type: integer
+        id:
+          type: integer
+        title:
+          type: string
+        body:
+          type: string
+  parameters:
+    postId:
+      name: postId
+      in: path
+      description: ID of the post
+      required: true
+      style: simple
+      schema:
+        type: integer
+
+paths:
+  /posts:
+    get:
+      operationId: listPosts
+      description: Get all posts
+      parameters:
+        - name: userId
+          in: query
+          description: Filter results by user ID
+          required: false
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Post'
+    post:
+      operationId: createPost
+      description: Create a new post
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Post'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Post'
+  /posts/{postId}:
+    get:
+      operationId: getPostById
+      description: Get a post by ID
+      parameters:
+        - $ref: '#/components/parameters/postId'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Post'
+    patch:
+      operationId: updatePost
+      description: Update a post
+      parameters:
+        - $ref: '#/components/parameters/postId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Post'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Post'
+    delete:
+      operationId: deletePost
+      description: Delete a post
+      parameters:
+        - $ref: '#/components/parameters/postId'
+      responses:
+        '200':
+          description: OK

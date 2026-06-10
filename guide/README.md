@@ -8,6 +8,7 @@ Ce dossier contient les guides pour configurer, personnaliser et faire évoluer 
 |-------|-------------|
 | [PWA](./pwa.md) | Configurer, personnaliser ou supprimer le support PWA |
 | [Architecture](./architecture.md) | Choisir entre app full-stack, frontend-only ou API-only |
+| [OpenAPI](./openapi.md) | SDK typé, composables, auth (classic + Keycloak), erreurs, BFF, connecteurs |
 
 ## 🏗️ Architecture par défaut
 
