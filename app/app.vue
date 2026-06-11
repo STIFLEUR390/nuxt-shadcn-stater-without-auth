@@ -9,5 +9,6 @@ import "vue-sonner/style.css"
       <NuxtPage />
     </NuxtLayout>
     <UiToaster />
+    <CookieControl locale="fr" />
   </div>
 </template>

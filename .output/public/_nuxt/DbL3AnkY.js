@@ -1,0 +1,1 @@
+import{W as s,Y as n,x as c}from"./B5LMVjcS.js";const r=s(async()=>{let a,e;const{can:t}=useAuthorization();if(!([a,e]=n(()=>t("manage-dashboard")),a=await a,e(),a))return c("/auth/login")});export{r as default};

@@ -1,0 +1,80 @@
+{
+  "app": {
+    "name": "My Application",
+    "description": "Modern Nuxt 4 Application"
+  },
+  "nav": {
+    "home": "Home",
+    "dashboard": "Dashboard",
+    "admin": "Administration",
+    "login": "Login",
+    "logout": "Logout",
+    "profile": "Profile",
+    "settings": "Settings"
+  },
+  "landing": {
+    "title": "Build faster",
+    "subtitle": "A complete Nuxt 4 starter kit for your modern applications",
+    "cta": "Get started",
+    "features": "Features",
+    "pricing": "Pricing",
+    "testimonials": "Testimonials",
+    "faq": "FAQ"
+  },
+  "auth": {
+    "login": "Login",
+    "signup": "Sign up",
+    "forgotPassword": "Forgot password",
+    "resetPassword": "Reset password",
+    "verifyEmail": "Verify email",
+    "email": "Email",
+    "password": "Password",
+    "confirmPassword": "Confirm password",
+    "rememberMe": "Remember me",
+    "noAccount": "No account?",
+    "hasAccount": "Already have an account?",
+    "signUp": "Sign up"
+  },
+  "dashboard": {
+    "welcome": "Hello {name}",
+    "overview": "Overview",
+    "analytics": "Analytics",
+    "webVitals": "Web Vitals",
+    "users": "Users",
+    "posts": "Posts",
+    "settings": "Settings"
+  },
+  "errors": {
+    "notFound": "Page not found",
+    "notFoundDesc": "The page you're looking for doesn't exist or has been moved.",
+    "forbidden": "Access denied",
+    "forbiddenDesc": "You don't have the required permissions.",
+    "serverError": "Server error",
+    "serverErrorDesc": "An unexpected error occurred.",
+    "backHome": "Back to home"
+  },
+  "common": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "create": "Create",
+    "search": "Search",
+    "loading": "Loading...",
+    "noData": "No data",
+    "confirm": "Confirm",
+    "yes": "Yes",
+    "no": "No",
+    "close": "Close"
+  },
+  "theme": {
+    "light": "Light",
+    "dark": "Dark",
+    "system": "System"
+  },
+  "language": {
+    "fr": "Français",
+    "en": "English",
+    "switch": "Switch language"
+  }
+}
