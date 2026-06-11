@@ -1,65 +1,80 @@
 # Guide du projet
 
-Ce dossier contient les guides pour configurer, personnaliser et faire évoluer le projet template.
+Documentation complète pour configurer, personnaliser et faire évoluer le starter kit.
 
-## 📚 Guides disponibles
+## 📚 Guides
 
-| Guide | Description |
-|-------|-------------|
-| [PWA](./pwa.md) | Configurer, personnaliser ou supprimer le support PWA |
-| [Architecture](./architecture.md) | Choisir entre app full-stack, frontend-only ou API-only |
-| [OpenAPI](./openapi.md) | SDK typé, composables, auth (classic + Keycloak), erreurs, BFF, connecteurs |
-| [Starter Kit](../PACKAGES_ANALYSIS.md) | Guide complet : Pinia, Auth OIDC, Permissions, Sentry, Web Vitals, Cookies RGPD, i18n |
+| Guide | Package | Description |
+|-------|---------|-------------|
+| [State](./state.md) | Pinia + unstorage | Store management et persistance |
+| [Auth](./auth.md) | nuxt-oidc-auth | Authentification OIDC (Keycloak, GitHub, Logto) |
+| [Autorisation](./authorization.md) | nuxt-authorization | Permissions & cas d'usage Laravel Spatie |
+| [Monitoring](./monitoring.md) | Sentry + Web Vitals | Capture d'erreurs, tracing, métriques de perf |
+| [Cookies RGPD](./cookies.md) | nuxt-cookie-control | Bannière de consentement conforme RGPD |
+| [i18n](./i18n.md) | @nuxtjs/i18n | Internationalisation français + anglais |
+| [OpenAPI](./openapi.md) | nuxt-openapi-hyperfetch | SDK typé, composables, auth, erreurs, BFF |
+| [PWA](./pwa.md) | @vite-pwa/nuxt | Progressive Web App, offline, manifest |
+| [Architecture](./architecture.md) | — | Full-stack, frontend-only ou API-only |
+| [Env](./env.md) | — | Référence des variables d'environnement |
 
-## 🏗️ Architecture par défaut
+## 🏗️ Architecture
 
-Le template est livré en mode **full-stack Nuxt** avec :
+Le template est livré en mode **full-stack Nuxt 4** :
 
-- **Frontend** : pages Vue, layouts, composants shadcn-vue
-- **Backend** : dossier `server/` pour les routes API Nitro
-- **State** : Pinia avec persistance via pinia-plugin-unstorage
-- **Auth** : nuxt-oidc-auth (Keycloak, GitHub, Logto)
-- **Permissions** : nuxt-authorization (compatible API Laravel Spatie)
-- **Monitoring** : @sentry/nuxt
-- **Cookies RGPD** : @dargmuesli/nuxt-cookie-control
-- **i18n** : @nuxtjs/i18n (Français + Anglais)
-- **PWA** : module `@vite-pwa/nuxt` activé avec `autoUpdate`
-- **OpenAPI** : client API auto-généré via `nuxt-openapi-hyperfetch`
+```
+app/                          # Frontend
+├── components/
+│   ├── ui/                   # 50+ composants shadcn-vue
+│   └── AppSidebar.vue        # Sidebar avec i18n, auth, permissions
+├── stores/                   # Pinia stores
+│   ├── auth.ts               # Utilisateur connecté
+│   └── webVitals.ts          # Métriques Web Vitals
+├── plugins/
+│   ├── pinia-unstorage.ts    # Persistance des stores
+│   ├── authorization-resolver.ts
+│   └── authorization-abilities.ts
+├── middleware/
+│   └── admin.ts              # Protection admin
+├── pages/
+│   ├── index.vue             # Landing page
+│   ├── auth/login.vue        # Connexion multi-providers
+│   ├── user/index.vue        # Dashboard utilisateur
+│   └── admin/
+│       ├── index.vue         # Dashboard admin
+│       └── web-vitals.vue    # Métriques Web Vitals
+└── layouts/                  # Layouts (default, auth, landing)
+
+locales/                      # Traductions i18n
+├── fr.json
+└── en.json
+
+server/                       # Backend Nitro
+├── plugins/
+│   └── authorization-resolver.ts
+└── api/web-vitals/           # Endpoints Web Vitals
+    ├── post.ts               # POST /api/web-vitals
+    └── list.get.ts           # GET /api/web-vitals/list
+```
 
 ## 📦 Modules installés
 
 | Module | Version | Statut |
 |--------|---------|--------|
-| @pinia/nuxt | 0.11.3 | ✅ Actif |
-| pinia-plugin-unstorage | 1.0.0-beta.1 | ✅ Actif |
-| nuxt-oidc-auth | 1.0.0-beta.11 | ✅ Actif (3 providers) |
-| nuxt-authorization | 0.3.5 | ✅ Actif |
+| @pinia/nuxt | 0.11.3 | ✅ |
+| pinia-plugin-unstorage | 1.0.0-beta.1 | ✅ |
+| nuxt-oidc-auth | 1.0.0-beta.11 | ✅ (Keycloak, GitHub, Logto) |
+| nuxt-authorization | 0.3.5 | ✅ |
 | @sentry/nuxt | 10.57.0 | ⏸️ Désactivé en dev |
-| @nuxtjs/web-vitals | 0.2.7 | ❌ Incompatible Nuxt 4 |
-| @dargmuesli/nuxt-cookie-control | 9.1.29 | ✅ Actif |
-| @nuxtjs/i18n | 10.4.0 | ✅ Actif |
+| @dargmuesli/nuxt-cookie-control | 9.1.29 | ✅ |
+| @nuxtjs/i18n | 10.4.0 | ✅ |
+| shadcn-nuxt | 2.5.1 | ✅ |
+| @nuxtjs/color-mode | 4.0.1 | ✅ |
+| @vite-pwa/nuxt | 1.1.1 | ✅ |
+| nuxt-openapi-hyperfetch | 2.0.4 | ✅ |
 
-## 🔑 Fichier d'environnement
-
-Copier `.env.example` vers `.env` et remplir les valeurs :
-
-```bash
-cp .env.example .env
-```
-
-### Providers OIDC supportés
-
-- ✅ **Keycloak** — presets natifs nuxt-oidc-auth
-- ✅ **GitHub** — presets natifs
-- ✅ **Logto** — presets natifs
-- ⚠️ **Google** — nécessite le preset générique `oidc` (pas encore dans les presets beta)
-
-## 🚀 Démarrage rapide
+## 🚀 Démarrage
 
 ```bash
-bun install
-cp .env.example .env  # Puis remplir .env
-bun dev
+cp .env.example .env   # Remplir les variables
+bun dev                # http://localhost:3000
 ```
-
-Tu peux adapter cette architecture selon tes besoins. Voir le [guide Architecture](./architecture.md).
